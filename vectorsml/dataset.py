@@ -13,7 +13,7 @@ class Dataset(ds):
 
         data = h5py.File(file)
 
-        def getInitalCompTensor(result):
+        def _getInitalCompTensor(result):
             for i in result.keys():
                 if "eccentricities" in i: 
                     initial = result[i]
@@ -21,7 +21,7 @@ class Dataset(ds):
                     initial_tensor = comp_tens[4] + 1j*comp_tens[5]
                     return initial_tensor
                 
-        def getFinalCompTensor(result):
+        def _getFinalCompTensor(result):
             final = result['particle_9999_dNdeta_pT_0.2_3.dat']
             comp_tens = torch.transpose(torch.tensor(final[:]), 0, 1)
             final_tensor = comp_tens[4] + 1j*comp_tens[5]
@@ -32,11 +32,11 @@ class Dataset(ds):
             spvn_result = data[v]
 
             self.results.append(
-                Result(v, getInitalCompTensor(spvn_result), getFinalCompTensor(spvn_result))
+                Result(v, _getInitalCompTensor(spvn_result), _getFinalCompTensor(spvn_result))
             )
 
     def __len__(self):
         return len(self.results)
 
     def __getitem__(self, item):
-        return self.results[item]
+        return (self.results[item].key, self.results[item].value)
